@@ -62,7 +62,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable{
         standardHandler.addEntity(player);
         this.addListener(player);
 
-        if (JOptionPane.showConfirmDialog(this, "Do you want to run the server") == 0) {
+        if (JOptionPane.showConfirmDialog(this, "Do you want to run the server ?") == 0) {
             socketServer = new GameServer(this);
             socketServer.start();
         }
