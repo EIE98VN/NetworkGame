@@ -15,7 +15,7 @@ public class Bullet extends StandardGameObject {
         this.y = y;
         this.id = (id == StandardID.Player) ? StandardID.Weapon : StandardID.Obstacle;
 
-        this.currentSprite = StdOps.loadImage("E:\\Term8\\Network Programming\\SpaceShooter01\\res\\bullet.png");
+        this.currentSprite = StdOps.loadImage("res/bullet.png");
 
         this.width = this.currentSprite.getWidth();
         this.height = this.currentSprite.getHeight();

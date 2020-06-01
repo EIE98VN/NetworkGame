@@ -29,7 +29,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable{
     public GenericSpaceShooter(int width, int height, String title) {
         super(width, height, title);
 
-        this.background = StdOps.loadImage("E:\\Term8\\Network Programming\\SpaceShooter01\\res\\bg.png");
+        this.background = StdOps.loadImage("res/bg.png");
         this.consoleFPS = false;
         standardHandler = new GenericSpaceShooterHandler();
 

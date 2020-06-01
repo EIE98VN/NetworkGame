@@ -5,7 +5,6 @@ import com.joshuacrotts.standards.StandardGameObject;
 import com.joshuacrotts.standards.StandardID;
 import com.joshuacrotts.standards.StdOps;
 import edu.hust.soict.huynv.GenericSpaceShooter;
-import edu.hust.soict.huynv.entities.Bullet;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +24,7 @@ public class Player extends StandardGameObject implements KeyListener {
     public Player(double x, double y, GenericSpaceShooter gss, String username){
         super(x, y, StandardID.Player);
         this.gss = gss;
-        this.currentSprite = StdOps.loadImage("E:\\Term8\\Network Programming\\SpaceShooter01\\res\\player.png");
+        this.currentSprite = StdOps.loadImage("res/player.png");
         this.username = username;
         this.width = this.currentSprite.getWidth();
         this.height = this.currentSprite.getHeight();

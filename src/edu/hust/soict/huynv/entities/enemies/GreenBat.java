@@ -3,7 +3,6 @@ package edu.hust.soict.huynv.entities.enemies;
 import com.joshuacrotts.standards.StdOps;
 import edu.hust.soict.huynv.GenericSpaceShooter;
 import edu.hust.soict.huynv.entities.Bullet;
-import edu.hust.soict.huynv.entities.enemies.Enemy;
 
 import java.awt.*;
 
@@ -12,7 +11,7 @@ public class GreenBat extends Enemy {
     public GreenBat(double x, double y ){
         super(x, y);
 
-        this.currentSprite = StdOps.loadImage("E:\\Term8\\Network Programming\\SpaceShooter01\\res\\greenbat.png");
+        this.currentSprite = StdOps.loadImage("res/greenbat.png");
 
         this.height = this.currentSprite.getHeight();
         this.width = this.currentSprite.getWidth();
