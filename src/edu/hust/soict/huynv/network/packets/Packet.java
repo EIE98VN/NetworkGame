@@ -19,7 +19,7 @@ public abstract class Packet {
         }
     }
 
-    public byte packetId;   
+    public byte packetId;
 
     public Packet(int packetId) {
         this.packetId = (byte) packetId;

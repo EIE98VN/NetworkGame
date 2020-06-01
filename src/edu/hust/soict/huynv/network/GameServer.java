@@ -62,7 +62,7 @@ public class GameServer extends Thread {
 //                        + ((Packet01Disconnect) packet).getUsername() + " has left...");
 //                this.removeConnection((Packet01Disconnect) packet);
                 break;
-            case MOVE:
+            case CONTROL:
 //                packet = new Packet02Move(data);
 //                this.handleMove(((Packet02Move) packet));
         }

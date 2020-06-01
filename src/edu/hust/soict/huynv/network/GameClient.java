@@ -59,7 +59,7 @@ public class GameClient extends Thread {
 //                        + ((PacketDisconnect) packet).getUsername() + " has left the world...");
 //                game.level.removePlayerMP(((PacketDisconnect) packet).getUsername());
                 break;
-            case MOVE:
+            case CONTROL:
 //                packet = new PacketControl(data);
 //                handleMove((PacketControl) packet);
         }
