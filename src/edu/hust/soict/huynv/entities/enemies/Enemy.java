@@ -10,8 +10,11 @@ public abstract class Enemy extends StandardGameObject {
 
     protected int interval = StdOps.rand(0, 120);
 
-    public Enemy(double x, double y){
+    public String name;
+
+    public Enemy(String name, double x, double y){
         super(x, y, StandardID.Enemy);
+        this.name = name;
     }
 
     @Override

@@ -3,13 +3,18 @@ package edu.hust.soict.huynv;
 import com.joshuacrotts.standards.StandardGameObject;
 import com.joshuacrotts.standards.StandardHandler;
 import com.joshuacrotts.standards.StandardID;
+import edu.hust.soict.huynv.entities.PlayerMP;
+import edu.hust.soict.huynv.entities.enemies.GreenBat;
+import edu.hust.soict.huynv.network.packets.PacketEnemy;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 public class GenericSpaceShooterHandler extends StandardHandler {
 
-    public GenericSpaceShooterHandler() {
+    private GenericSpaceShooter gss;
+    public GenericSpaceShooterHandler(GenericSpaceShooter gss) {
+        this.gss = gss;
         this.entities = new ArrayList<StandardGameObject>();
     }
 
@@ -36,7 +41,7 @@ public class GenericSpaceShooterHandler extends StandardHandler {
 //                }
 //            }
 
-            //Player to Bullet collision
+            //Player and Enemy collision
             if (this.entities.get(i).getId() == StandardID.Player) {
 
                 for (int j = 0; j < this.entities.size(); j++) {
@@ -46,7 +51,15 @@ public class GenericSpaceShooterHandler extends StandardHandler {
                             this.entities.get(j).getBounds().intersects(this.entities.get(i).getBounds())) {
 
                         this.entities.get(i).health -= 20;
-                        this.entities.remove(j);
+
+                        GreenBat greenBat = (GreenBat) this.entities.get(j);
+                        PacketEnemy packetEnemy = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y);
+                        packetEnemy.writeData(gss.socketClient);
+
+                        if(gss.isServer){
+                            this.entities.remove(j);
+                        }
+
                         j--;
 
                     }
@@ -55,16 +68,14 @@ public class GenericSpaceShooterHandler extends StandardHandler {
 
             }
 
-            //Player bullet to Enemy
+            //Player's bullet and Enemy collision
             if (this.entities.get(i).getId() == StandardID.Weapon) {
 
                 for (int j = 0; j < this.entities.size(); j++) {
-
                     if (this.entities.get(j).getId() == StandardID.Enemy &&
                             this.entities.get(j).getBounds().intersects(this.entities.get(i).getBounds())) {
 
                         this.entities.get(j).health -= 20;
-
                     }
 
                 }
@@ -79,5 +90,53 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         for (int i = 0; i < this.entities.size(); i++) {
             this.entities.get(i).render(graphics2D);
         }
+    }
+
+    private int getPlayerMPIndex(String username) {
+        int index = 0;
+        for (StandardGameObject e : getEntities()) {
+            if (e instanceof PlayerMP && ((PlayerMP) e).getUsername().equals(username)) {
+                break;
+            }
+            index++;
+        }
+        return index;
+    }
+
+    public void movePlayer(String username, int x, int y) {
+        int index = getPlayerMPIndex(username);
+        PlayerMP player = (PlayerMP) this.getEntities().get(index);
+        player.x = x;
+        player.y = y;
+    }
+
+    private synchronized int getEnemyIndex(String name) {
+        int index = 0;
+        for (StandardGameObject e : getEntities()) {
+            if (e instanceof GreenBat && ((GreenBat) e).name.equals(name)) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    public synchronized void handleEnemy(String enemyName, int x, int y){
+        if(getEnemyIndex(enemyName)==-1){
+            GreenBat greenBat = new GreenBat(enemyName, x, y, this.gss);
+            this.addEntity(greenBat);
+        }else{
+            this.entities.remove(getEnemy(enemyName));
+        }
+
+    }
+
+    private synchronized GreenBat getEnemy(String name){
+        for (StandardGameObject e : getEntities()) {
+            if (e instanceof GreenBat && ((GreenBat) e).name.equals(name)) {
+                return (GreenBat) e;
+            }
+        }
+        return null;
     }
 }

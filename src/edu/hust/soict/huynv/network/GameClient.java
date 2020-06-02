@@ -1,11 +1,9 @@
 package edu.hust.soict.huynv.network;
 
 import edu.hust.soict.huynv.GenericSpaceShooter;
-import edu.hust.soict.huynv.network.packets.Packet;
+import edu.hust.soict.huynv.entities.enemies.GreenBat;
+import edu.hust.soict.huynv.network.packets.*;
 import edu.hust.soict.huynv.entities.PlayerMP;
-import edu.hust.soict.huynv.network.packets.PacketControl;
-import edu.hust.soict.huynv.network.packets.PacketDisconnect;
-import edu.hust.soict.huynv.network.packets.PacketLogin;
 
 import java.io.IOException;
 import java.net.*;
@@ -60,8 +58,12 @@ public class GameClient extends Thread {
 //                game.level.removePlayerMP(((PacketDisconnect) packet).getUsername());
                 break;
             case CONTROL:
-//                packet = new PacketControl(data);
-//                handleMove((PacketControl) packet);
+                packet = new PacketControl(data);
+                handleControl((PacketControl) packet);
+                break;
+            case ENEMY:
+                packet = new PacketEnemy(data);
+                this.handleEnemy((PacketEnemy) packet);
         }
     }
 
@@ -83,9 +85,11 @@ public class GameClient extends Thread {
         GenericSpaceShooter.standardHandler.addEntity(player);
     }
 
-//    private void handleMove(Packet02Move packet) {
-//        this.game.level.movePlayer(packet.getUsername(), packet.getX(), packet.getY(), packet.getNumSteps(),
-//                packet.isMoving(), packet.getMovingDir());
-//    }
+    private void handleControl(PacketControl packet) {
+        GenericSpaceShooter.standardHandler.movePlayer(packet.getUsername(), packet.getX(), packet.getY());
+    }
 
+    private void handleEnemy(PacketEnemy packet){
+        GenericSpaceShooter.standardHandler.handleEnemy(packet.name, packet.x, packet.y);
+    }
 }

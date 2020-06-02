@@ -3,14 +3,17 @@ package edu.hust.soict.huynv.entities.enemies;
 import com.joshuacrotts.standards.StdOps;
 import edu.hust.soict.huynv.GenericSpaceShooter;
 import edu.hust.soict.huynv.entities.Bullet;
+import edu.hust.soict.huynv.network.packets.PacketEnemy;
 
 import java.awt.*;
 
 public class GreenBat extends Enemy {
 
-    public GreenBat(double x, double y ){
-        super(x, y);
+    private GenericSpaceShooter gss;
 
+    public GreenBat(String name, double x, double y, GenericSpaceShooter gss){
+        super(name, x, y);
+        this.gss = gss;
         this.currentSprite = StdOps.loadImage("res/greenbat.png");
 
         this.height = this.currentSprite.getHeight();
@@ -24,7 +27,12 @@ public class GreenBat extends Enemy {
     public void tick() {
 
         if(this.health <= 0 || this.y >= 900){
-            GenericSpaceShooter.standardHandler.removeEntity(this);
+            PacketEnemy packetEnemy = new PacketEnemy(this.name, (int) this.x, (int) this.y);
+            packetEnemy.writeData(gss.socketClient);
+            if(gss.isServer){
+                GenericSpaceShooter.standardHandler.removeEntity(this);
+
+            }
             if(this.health <= 0) GenericSpaceShooter.score++;
             return;
         }

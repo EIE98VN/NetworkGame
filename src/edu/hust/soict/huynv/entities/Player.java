@@ -5,6 +5,7 @@ import com.joshuacrotts.standards.StandardGameObject;
 import com.joshuacrotts.standards.StandardID;
 import com.joshuacrotts.standards.StdOps;
 import edu.hust.soict.huynv.GenericSpaceShooter;
+import edu.hust.soict.huynv.network.packets.PacketControl;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,6 +44,9 @@ public class Player extends StandardGameObject implements KeyListener {
 
         this.x += this.velX;
         this.y += this.velY;
+
+        PacketControl packetControl = new PacketControl(this.username, (int) this.getX(), (int) this.getY());
+        packetControl.writeData(gss.socketClient);
 
         this.firBulletCheck();
         this.checkCoordinates();

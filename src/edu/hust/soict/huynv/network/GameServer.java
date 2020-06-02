@@ -2,7 +2,10 @@ package edu.hust.soict.huynv.network;
 
 import edu.hust.soict.huynv.GenericSpaceShooter;
 import edu.hust.soict.huynv.entities.PlayerMP;
+import edu.hust.soict.huynv.entities.enemies.GreenBat;
 import edu.hust.soict.huynv.network.packets.Packet;
+import edu.hust.soict.huynv.network.packets.PacketControl;
+import edu.hust.soict.huynv.network.packets.PacketEnemy;
 import edu.hust.soict.huynv.network.packets.PacketLogin;
 
 import java.io.IOException;
@@ -63,9 +66,17 @@ public class GameServer extends Thread {
 //                this.removeConnection((Packet01Disconnect) packet);
                 break;
             case CONTROL:
-//                packet = new Packet02Move(data);
-//                this.handleMove(((Packet02Move) packet));
+                packet = new PacketControl(data);
+                this.handleControl((PacketControl) packet);
+                break;
+            case ENEMY:
+                packet = new PacketEnemy(data);
+                this.handleEnemy((PacketEnemy) packet);
         }
+    }
+
+    private void handleEnemy(PacketEnemy packet) {
+        packet.writeData(this);
     }
 
     public void addConnection(PlayerMP player, PacketLogin packet) {
@@ -138,17 +149,14 @@ public class GameServer extends Thread {
         }
     }
 
-//    private void handleMove(Packet02Move packet) {
-//        if (getPlayerMP(packet.getUsername()) != null) {
-//            int index = getPlayerMPIndex(packet.getUsername());
-//            PlayerMP player = this.connectedPlayers.get(index);
-//            player.x = packet.getX();
-//            player.y = packet.getY();
-//            player.setMoving(packet.isMoving());
-//            player.setMovingDir(packet.getMovingDir());
-//            player.setNumSteps(packet.getNumSteps());
-//            packet.writeData(this);
-//        }
-//    }
+    private void handleControl(PacketControl packet) {
+        if (getPlayerMP(packet.getUsername()) != null) {
+            int index = getPlayerMPIndex(packet.getUsername());
+            PlayerMP player = this.connectedPlayers.get(index);
+            player.x = packet.getX();
+            player.y = packet.getY();
+            packet.writeData(this);
+        }
+    }
 
 }
