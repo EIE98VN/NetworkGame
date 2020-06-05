@@ -9,9 +9,12 @@ import java.awt.*;
 
 public class GreenBat extends Enemy {
 
-    private GenericSpaceShooter gss;
 
-    public GreenBat(String name, double x, double y, GenericSpaceShooter gss){
+    private GenericSpaceShooter gss;
+    private boolean isCounted = false;
+
+
+    public GreenBat(String name, double x, double y, GenericSpaceShooter gss) {
         super(name, x, y);
         this.gss = gss;
         this.currentSprite = StdOps.loadImage("res/greenbat.png");
@@ -26,14 +29,17 @@ public class GreenBat extends Enemy {
     @Override
     public void tick() {
 
-        if(this.health <= 0 || this.y >= 900){
-            PacketEnemy packetEnemy = new PacketEnemy(this.name, (int) this.x, (int) this.y);
-            packetEnemy.writeData(gss.socketClient);
-            if(gss.isServer){
-                GenericSpaceShooter.standardHandler.removeEntity(this);
-
+        if (this.health <= 0 || this.y >= 800) {
+            if (this.health <= 0) {
+                PacketEnemy packetEnemy = new PacketEnemy(this.name, (int) this.x, (int) this.y);
+                packetEnemy.writeData(gss.socketClient);
             }
-            if(this.health <= 0) GenericSpaceShooter.score++;
+            GenericSpaceShooter.standardHandler.removeEntity(this);
+
+//            if (this.health <= 0 && !isCounted){
+//                GenericSpaceShooter.score++;
+//                isCounted = true;
+//            }
             return;
         }
 
@@ -51,18 +57,18 @@ public class GreenBat extends Enemy {
 
     @Override
     public void fireBullet() {
-        if(this.interval < 200){
+        if (this.interval < 200) {
             return;
-        }else{
+        } else {
             this.interval = 0;
             GenericSpaceShooter.standardHandler.addEntity(new Bullet((this.x + this.width / 2), this.y, 2, this.getId()));
         }
     }
 
-    private void fireBulletCheck(){
-        this.interval ++;
+    private void fireBulletCheck() {
+        this.interval++;
 
-        if(this.interval > 200){
+        if (this.interval > 200) {
             this.interval = 200;
         }
     }

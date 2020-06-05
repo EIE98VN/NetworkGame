@@ -22,6 +22,8 @@ public class Player extends StandardGameObject implements KeyListener {
 
     private String username;
 
+    public int score;
+
     public Player(double x, double y, GenericSpaceShooter gss, String username){
         super(x, y, StandardID.Player);
         this.gss = gss;
@@ -30,7 +32,7 @@ public class Player extends StandardGameObject implements KeyListener {
         this.width = this.currentSprite.getWidth();
         this.height = this.currentSprite.getHeight();
 
-        this.health = 50;
+        this.health = 500;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class Player extends StandardGameObject implements KeyListener {
 
         if(this.health <= 0){
             GenericSpaceShooter.standardHandler.removeEntity(this);
-            JOptionPane.showMessageDialog(null, "You died, your score was: "+GenericSpaceShooter.score);
+            JOptionPane.showMessageDialog(null, "Player " + username + " died, score was: "+GenericSpaceShooter.score);
 //            System.exit(0);
         }
 
@@ -56,9 +58,9 @@ public class Player extends StandardGameObject implements KeyListener {
     public void render(Graphics2D graphics2D) {
         graphics2D.drawImage(this.currentSprite, (int) x, (int) y, null);
 
-        StandardDraw.text(username, (int) this.x + 50, (int) this.y +20 , "", 20f, Color.BLUE);
-        StandardDraw.text("Life: "+this.health, 20, 50, "", 40f, Color.YELLOW);
-        StandardDraw.text("Score: "+GenericSpaceShooter.score, 20, 90, "", 40f, Color.YELLOW);
+        StandardDraw.text("Name: "+ this.username, (int) this.x + 50, (int) this.y +10 , "", 15f, Color.BLUE);
+        StandardDraw.text("Life: "+this.health, (int) this.x + 50, (int) this.y +20, "", 15f, Color.GREEN);
+        StandardDraw.text("Score: "+this.score, (int) this.x + 50, (int) this.y +30, "", 15f, Color.RED);
     }
 
     @Override

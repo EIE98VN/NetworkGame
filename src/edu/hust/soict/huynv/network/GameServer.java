@@ -1,5 +1,6 @@
 package edu.hust.soict.huynv.network;
 
+import com.joshuacrotts.standards.StandardGameObject;
 import edu.hust.soict.huynv.GenericSpaceShooter;
 import edu.hust.soict.huynv.entities.PlayerMP;
 import edu.hust.soict.huynv.entities.enemies.GreenBat;
@@ -20,7 +21,7 @@ public class GameServer extends Thread {
 
     private DatagramSocket socket;
     private GenericSpaceShooter gss;
-    private List<PlayerMP> connectedPlayers = new ArrayList<>();
+    public List<PlayerMP> connectedPlayers = new ArrayList<>();
 
     public GameServer(GenericSpaceShooter gss) {
         this.gss = gss;
@@ -77,6 +78,12 @@ public class GameServer extends Thread {
 
     private void handleEnemy(PacketEnemy packet) {
         packet.writeData(this);
+        if(packet.name!=null){
+            if(getEnemy(packet.name) != null){
+//                GenericSpaceShooter.standardHandler.entities.remove(getEnemy(packet.name));
+                (getEnemy(packet.name)).health = 0;
+                }
+        }
     }
 
     public void addConnection(PlayerMP player, PacketLogin packet) {
@@ -104,9 +111,10 @@ public class GameServer extends Thread {
         if (!alreadyConnected) {
             this.connectedPlayers.add(player);
             GenericSpaceShooter.standardHandler.addEntity(player);
+            GenericSpaceShooter.standardHandler.playerList.add(player);
         }
     }
-//
+
 //    public void removeConnection(Packet01Disconnect packet) {
 //        this.connectedPlayers.remove(getPlayerMPIndex(packet.getUsername()));
 //        packet.writeData(this);
@@ -159,4 +167,13 @@ public class GameServer extends Thread {
         }
     }
 
+
+    private GreenBat getEnemy(String name){
+        for (StandardGameObject e : GenericSpaceShooter.standardHandler.entities) {
+            if (e instanceof GreenBat && ((GreenBat) e).name.equals(name)) {
+                return (GreenBat) e;
+            }
+        }
+        return null;
+    }
 }

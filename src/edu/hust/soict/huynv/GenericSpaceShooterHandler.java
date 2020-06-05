@@ -13,6 +13,8 @@ import java.util.ArrayList;
 public class GenericSpaceShooterHandler extends StandardHandler {
 
     private GenericSpaceShooter gss;
+    public ArrayList<PlayerMP> playerList = new ArrayList<>();
+
     public GenericSpaceShooterHandler(GenericSpaceShooter gss) {
         this.gss = gss;
         this.entities = new ArrayList<StandardGameObject>();
@@ -76,12 +78,18 @@ public class GenericSpaceShooterHandler extends StandardHandler {
                             this.entities.get(j).getBounds().intersects(this.entities.get(i).getBounds())) {
 
                         this.entities.get(j).health -= 20;
+
+                        if(this.entities.get(j).health <= 0 ){
+                            playerList.get(0).score ++;
+                        }
                     }
 
                 }
 
             }
 
+
+            //Score
             this.entities.get(i).tick();
         }
     }

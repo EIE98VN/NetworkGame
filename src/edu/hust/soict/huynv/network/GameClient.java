@@ -83,6 +83,7 @@ public class GameClient extends Thread {
                 + " has joined the game...");
         PlayerMP player = new PlayerMP(packet.getX(), packet.getY(), this.gss, packet.getUsername(), address, port);
         GenericSpaceShooter.standardHandler.addEntity(player);
+        GenericSpaceShooter.standardHandler.playerList.add(player);
     }
 
     private void handleControl(PacketControl packet) {
