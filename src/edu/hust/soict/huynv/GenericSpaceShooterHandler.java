@@ -3,6 +3,7 @@ package edu.hust.soict.huynv;
 import com.joshuacrotts.standards.StandardGameObject;
 import com.joshuacrotts.standards.StandardHandler;
 import com.joshuacrotts.standards.StandardID;
+import edu.hust.soict.huynv.entities.Player;
 import edu.hust.soict.huynv.entities.PlayerMP;
 import edu.hust.soict.huynv.entities.enemies.GreenBat;
 import edu.hust.soict.huynv.network.packets.PacketEnemy;
@@ -23,25 +24,8 @@ public class GenericSpaceShooterHandler extends StandardHandler {
     public void tick() {
         for (int i = 0; i < this.entities.size(); i++) {
 
-//            if (this.entities.get(i).getId() == StandardID.Enemy) {
-//                ArrayList<Integer> removes = new ArrayList<Integer>();
-//                int size = this.entities.size();
-//                for (int j = 0; j < size; j++) {
-//                    for (int k = 0; k < removes.size(); k++) {
-//                        System.out.println("here");
-//
-//                        if (j == removes.get(k)) break;
-//                        if (this.entities.get(j).getId() == StandardID.Enemy) {
-//                            double distance = Math.abs(this.entities.get(i).getX() - this.entities.get(j).getX());
-//                            System.out.println(distance);
-//                            if (distance > 0 && distance < 60) {
-//                                this.entities.remove(j);
-//                                removes.add(j);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
+//            if((this.entities.get(i) instanceof PlayerMP) && !(((PlayerMP) this.entities.get(i)).getUsername().equals(playerList.get(0).getUsername())))
+//                    continue;
 
             //Player and Enemy collision
             if (this.entities.get(i).getId() == StandardID.Player) {
@@ -80,7 +64,7 @@ public class GenericSpaceShooterHandler extends StandardHandler {
                         this.entities.get(j).health -= 20;
 
                         if(this.entities.get(j).health <= 0 ){
-                            playerList.get(0).score ++;
+                            playerList.get(0).score++;
                         }
                     }
 
@@ -89,7 +73,6 @@ public class GenericSpaceShooterHandler extends StandardHandler {
             }
 
 
-            //Score
             this.entities.get(i).tick();
         }
     }
@@ -111,9 +94,10 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         return index;
     }
 
-    public void movePlayer(String username, int x, int y) {
+    public void handlePlayer(String username, int score, int x, int y) {
         int index = getPlayerMPIndex(username);
         PlayerMP player = (PlayerMP) this.getEntities().get(index);
+        player.score = score;
         player.x = x;
         player.y = y;
     }

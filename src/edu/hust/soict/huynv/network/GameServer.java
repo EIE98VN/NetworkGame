@@ -5,7 +5,7 @@ import edu.hust.soict.huynv.GenericSpaceShooter;
 import edu.hust.soict.huynv.entities.PlayerMP;
 import edu.hust.soict.huynv.entities.enemies.GreenBat;
 import edu.hust.soict.huynv.network.packets.Packet;
-import edu.hust.soict.huynv.network.packets.PacketControl;
+import edu.hust.soict.huynv.network.packets.PacketPlayer;
 import edu.hust.soict.huynv.network.packets.PacketEnemy;
 import edu.hust.soict.huynv.network.packets.PacketLogin;
 
@@ -66,9 +66,9 @@ public class GameServer extends Thread {
 //                        + ((Packet01Disconnect) packet).getUsername() + " has left...");
 //                this.removeConnection((Packet01Disconnect) packet);
                 break;
-            case CONTROL:
-                packet = new PacketControl(data);
-                this.handleControl((PacketControl) packet);
+            case PLAYER:
+                packet = new PacketPlayer(data);
+                this.handlePlayer((PacketPlayer) packet);
                 break;
             case ENEMY:
                 packet = new PacketEnemy(data);
@@ -157,18 +157,21 @@ public class GameServer extends Thread {
         }
     }
 
-    private void handleControl(PacketControl packet) {
+    private void handlePlayer(PacketPlayer packet) {
         if (getPlayerMP(packet.getUsername()) != null) {
-            int index = getPlayerMPIndex(packet.getUsername());
-            PlayerMP player = this.connectedPlayers.get(index);
-            player.x = packet.getX();
-            player.y = packet.getY();
+            if(!packet.getUsername().equals(GenericSpaceShooter.standardHandler.playerList.get(0).getUsername())){
+                int index = getPlayerMPIndex(packet.getUsername());
+                PlayerMP player = this.connectedPlayers.get(index);
+                player.score = packet.getScore();
+                player.x = packet.getX();
+                player.y = packet.getY();
+            }
             packet.writeData(this);
         }
     }
 
 
-    private GreenBat getEnemy(String name){
+    private synchronized GreenBat getEnemy(String name){
         for (StandardGameObject e : GenericSpaceShooter.standardHandler.entities) {
             if (e instanceof GreenBat && ((GreenBat) e).name.equals(name)) {
                 return (GreenBat) e;

@@ -6,7 +6,7 @@ import edu.hust.soict.huynv.network.GameServer;
 public abstract class Packet {
 
     public static enum PacketTypes {
-        INVALID(-1), LOGIN(00), DISCONNECT(01), CONTROL(02), ENEMY(03);
+        INVALID(-1), LOGIN(00), DISCONNECT(01), PLAYER(02), ENEMY(03);
 
         private int packetId;
 

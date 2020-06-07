@@ -5,7 +5,7 @@ import com.joshuacrotts.standards.StandardGameObject;
 import com.joshuacrotts.standards.StandardID;
 import com.joshuacrotts.standards.StdOps;
 import edu.hust.soict.huynv.GenericSpaceShooter;
-import edu.hust.soict.huynv.network.packets.PacketControl;
+import edu.hust.soict.huynv.network.packets.PacketPlayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,15 +40,18 @@ public class Player extends StandardGameObject implements KeyListener {
 
         if(this.health <= 0){
             GenericSpaceShooter.standardHandler.removeEntity(this);
-            JOptionPane.showMessageDialog(null, "Player " + username + " died, score was: "+GenericSpaceShooter.score);
+//            JOptionPane.showMessageDialog(null, "Player " + username + " died, score was: "+GenericSpaceShooter.score);
 //            System.exit(0);
         }
 
         this.x += this.velX;
         this.y += this.velY;
 
-        PacketControl packetControl = new PacketControl(this.username, (int) this.getX(), (int) this.getY());
-        packetControl.writeData(gss.socketClient);
+        //only main player of this game sends packet
+        if(this.username.equals(GenericSpaceShooter.standardHandler.playerList.get(0).getUsername())){
+            PacketPlayer packetPlayer = new PacketPlayer(this.username, this.score, (int) this.getX(), (int) this.getY());
+            packetPlayer.writeData(gss.socketClient);
+        }
 
         this.firBulletCheck();
         this.checkCoordinates();
@@ -58,9 +61,9 @@ public class Player extends StandardGameObject implements KeyListener {
     public void render(Graphics2D graphics2D) {
         graphics2D.drawImage(this.currentSprite, (int) x, (int) y, null);
 
-        StandardDraw.text("Name: "+ this.username, (int) this.x + 50, (int) this.y +10 , "", 15f, Color.BLUE);
+        StandardDraw.text("Name: "+ this.username, (int) this.x + 50, (int) this.y  , "", 15f, Color.WHITE);
         StandardDraw.text("Life: "+this.health, (int) this.x + 50, (int) this.y +20, "", 15f, Color.GREEN);
-        StandardDraw.text("Score: "+this.score, (int) this.x + 50, (int) this.y +30, "", 15f, Color.RED);
+        StandardDraw.text("Score: "+this.score, (int) this.x + 50, (int) this.y +40, "", 15f, Color.RED);
     }
 
     @Override

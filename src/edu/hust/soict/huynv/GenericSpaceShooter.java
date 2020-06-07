@@ -23,7 +23,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
     public GameClient socketClient;
     public GameServer socketServer;
     public BufferedImage background = null;
-    public boolean isServer = false;
+    public static boolean isServer = false;
 
     public int enemyCount = 0;
 
@@ -44,9 +44,9 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
 
     @Override
     public void tick() {
+        //only server generates enemy
         if ((GenericSpaceShooter.standardHandler.size() < 5) && isServer) {
             enemyCount++;
-            System.out.println("Enemy "+ enemyCount);
             GreenBat greenBat = new GreenBat("enemy" + enemyCount, StdOps.rand(50, 450), StdOps.rand(-500, -50), this);
             PacketEnemy enemyPacket = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y);
             enemyPacket.writeData(this.socketClient);
@@ -88,7 +88,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
 
         if (socketServer != null) {
             while (socketServer.connectedPlayers.size() < 2) {
-                System.out.println("Size " + socketServer.connectedPlayers.size());
+                System.out.println("Client count: " + socketServer.connectedPlayers.size());
             }
         }
         super.StartGame();

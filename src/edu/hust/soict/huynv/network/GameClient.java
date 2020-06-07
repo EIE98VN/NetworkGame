@@ -1,7 +1,6 @@
 package edu.hust.soict.huynv.network;
 
 import edu.hust.soict.huynv.GenericSpaceShooter;
-import edu.hust.soict.huynv.entities.enemies.GreenBat;
 import edu.hust.soict.huynv.network.packets.*;
 import edu.hust.soict.huynv.entities.PlayerMP;
 
@@ -57,9 +56,9 @@ public class GameClient extends Thread {
 //                        + ((PacketDisconnect) packet).getUsername() + " has left the world...");
 //                game.level.removePlayerMP(((PacketDisconnect) packet).getUsername());
                 break;
-            case CONTROL:
-                packet = new PacketControl(data);
-                handleControl((PacketControl) packet);
+            case PLAYER:
+                packet = new PacketPlayer(data);
+                handlePlayer((PacketPlayer) packet);
                 break;
             case ENEMY:
                 packet = new PacketEnemy(data);
@@ -86,8 +85,10 @@ public class GameClient extends Thread {
         GenericSpaceShooter.standardHandler.playerList.add(player);
     }
 
-    private void handleControl(PacketControl packet) {
-        GenericSpaceShooter.standardHandler.movePlayer(packet.getUsername(), packet.getX(), packet.getY());
+    private void handlePlayer(PacketPlayer packet) {
+        if(packet.getUsername().equals(GenericSpaceShooter.standardHandler.playerList.get(0).getUsername()))
+            return;
+        GenericSpaceShooter.standardHandler.handlePlayer(packet.getUsername(), packet.getScore(), packet.getX(), packet.getY());
     }
 
     private void handleEnemy(PacketEnemy packet){

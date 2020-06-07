@@ -36,10 +36,6 @@ public class GreenBat extends Enemy {
             }
             GenericSpaceShooter.standardHandler.removeEntity(this);
 
-//            if (this.health <= 0 && !isCounted){
-//                GenericSpaceShooter.score++;
-//                isCounted = true;
-//            }
             return;
         }
 
