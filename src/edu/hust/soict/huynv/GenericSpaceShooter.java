@@ -50,7 +50,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
             GreenBat greenBat = new GreenBat("enemy" + enemyCount, StdOps.rand(50, 450), StdOps.rand(-500, -50), this);
             PacketEnemy enemyPacket = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y);
             enemyPacket.writeData(this.socketClient);
-            GenericSpaceShooter.standardHandler.addEntity(greenBat);
+            GenericSpaceShooter.standardHandler.getEntities().add(greenBat);
         }
         StandardHandler.Handler(standardHandler);
     }
@@ -66,7 +66,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
     public synchronized void StartGame() {
         PlayerMP player = new PlayerMP(200, 800, this, JOptionPane.showInputDialog(this, "Please enter a username"));
 
-        standardHandler.addEntity(player);
+        standardHandler.getEntities().add(player);
         standardHandler.playerList.add(player);
         this.addListener(player);
 
@@ -89,6 +89,11 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
         if (socketServer != null) {
             while (socketServer.connectedPlayers.size() < 2) {
                 System.out.println("Client count: " + socketServer.connectedPlayers.size());
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         super.StartGame();

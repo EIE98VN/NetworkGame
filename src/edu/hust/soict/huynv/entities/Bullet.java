@@ -8,6 +8,22 @@ import edu.hust.soict.huynv.GenericSpaceShooter;
 import java.awt.*;
 
 public class Bullet extends StandardGameObject {
+    private String username;
+
+    public Bullet(double x, double y, double velY, StandardID id, String username){
+
+        this.x = x ;
+        this.y = y;
+        this.id = (id == StandardID.Player) ? StandardID.Weapon : StandardID.Obstacle;
+        this.username = username;
+
+        this.currentSprite = StdOps.loadImage("res/bullet.png");
+
+        this.width = this.currentSprite.getWidth();
+        this.height = this.currentSprite.getHeight();
+
+        this.velY = velY;
+    }
 
     public Bullet(double x, double y, double velY, StandardID id){
 
@@ -27,7 +43,7 @@ public class Bullet extends StandardGameObject {
     public void tick() {
 
         if(this.y <= -300 || this.y >= 1500){
-            GenericSpaceShooter.standardHandler.removeEntity(this);
+            GenericSpaceShooter.standardHandler.getEntities().remove(this);
             return;
         }
 
@@ -42,5 +58,9 @@ public class Bullet extends StandardGameObject {
         }else{
             graphics2D.drawImage(this.currentSprite, (int) x - 2, (int) y, width, -height, null);
         }
+    }
+
+    public String getUsername(){
+        return this.username;
     }
 }

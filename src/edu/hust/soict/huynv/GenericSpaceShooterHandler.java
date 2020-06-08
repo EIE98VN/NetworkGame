@@ -3,9 +3,10 @@ package edu.hust.soict.huynv;
 import com.joshuacrotts.standards.StandardGameObject;
 import com.joshuacrotts.standards.StandardHandler;
 import com.joshuacrotts.standards.StandardID;
-import edu.hust.soict.huynv.entities.Player;
+import edu.hust.soict.huynv.entities.Bullet;
 import edu.hust.soict.huynv.entities.PlayerMP;
 import edu.hust.soict.huynv.entities.enemies.GreenBat;
+import edu.hust.soict.huynv.network.packets.PacketBullet;
 import edu.hust.soict.huynv.network.packets.PacketEnemy;
 
 import java.awt.*;
@@ -43,7 +44,7 @@ public class GenericSpaceShooterHandler extends StandardHandler {
                         packetEnemy.writeData(gss.socketClient);
 
                         if(gss.isServer){
-                            this.entities.remove(j);
+                            this.getEntities().remove(j);
                         }
 
                         j--;
@@ -57,17 +58,20 @@ public class GenericSpaceShooterHandler extends StandardHandler {
             //Player's bullet and Enemy collision
             if (this.entities.get(i).getId() == StandardID.Weapon) {
 
-                for (int j = 0; j < this.entities.size(); j++) {
-                    if (this.entities.get(j).getId() == StandardID.Enemy &&
-                            this.entities.get(j).getBounds().intersects(this.entities.get(i).getBounds())) {
+                Bullet bullet = (Bullet) this.getEntities().get(i);
+                if(bullet.getUsername().equals(this.playerList.get(0).getUsername())){
+                    for (int j = 0; j < this.entities.size(); j++) {
+                        if (this.entities.get(j).getId() == StandardID.Enemy &&
+                                this.entities.get(j).getBounds().intersects(this.entities.get(i).getBounds())) {
 
-                        this.entities.get(j).health -= 20;
+                            this.entities.get(j).health -= 20;
 
-                        if(this.entities.get(j).health <= 0 ){
-                            playerList.get(0).score++;
+                            if(this.entities.get(j).health <= 0 ){
+                                playerList.get(0).score++;
+                            }
                         }
-                    }
 
+                    }
                 }
 
             }
@@ -102,7 +106,7 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         player.y = y;
     }
 
-    private synchronized int getEnemyIndex(String name) {
+    private int getEnemyIndex(String name) {
         int index = 0;
         for (StandardGameObject e : getEntities()) {
             if (e instanceof GreenBat && ((GreenBat) e).name.equals(name)) {
@@ -113,22 +117,36 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         return -1;
     }
 
-    public synchronized void handleEnemy(String enemyName, int x, int y){
+    public  void handleEnemy(String enemyName, int x, int y){
         if(getEnemyIndex(enemyName)==-1){
             GreenBat greenBat = new GreenBat(enemyName, x, y, this.gss);
-            this.addEntity(greenBat);
+            this.getEntities().add(greenBat);
         }else{
-            this.entities.remove(getEnemy(enemyName));
+            this.getEntities().remove(getEnemy(enemyName));
         }
 
     }
 
-    private synchronized GreenBat getEnemy(String name){
+    private  GreenBat getEnemy(String name){
         for (StandardGameObject e : getEntities()) {
             if (e instanceof GreenBat && ((GreenBat) e).name.equals(name)) {
                 return (GreenBat) e;
             }
         }
         return null;
+    }
+
+    public synchronized ArrayList<StandardGameObject> getEntities(){
+
+        return this.entities;
+    }
+
+
+    public void handleBullet(PacketBullet packet) {
+        if(packet != null){
+            StandardID id = (packet.getId().equals("Player")) ? StandardID.Player:StandardID.Enemy;
+            Bullet bullet = new Bullet(packet.getX(), packet.getY(), packet.getVelY(), id, packet.getUsername());
+            this.getEntities().add(bullet);
+        }
     }
 }

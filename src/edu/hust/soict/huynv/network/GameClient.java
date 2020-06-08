@@ -63,8 +63,13 @@ public class GameClient extends Thread {
             case ENEMY:
                 packet = new PacketEnemy(data);
                 this.handleEnemy((PacketEnemy) packet);
+                break;
+            case BULLET:
+                packet = new PacketBullet(data);
+                this.handleBullet((PacketBullet) packet);
         }
     }
+
 
     public void sendData(byte[] data) {
 
@@ -81,7 +86,7 @@ public class GameClient extends Thread {
         System.out.println("[" + address.getHostAddress() + ":" + port + "] " + packet.getUsername()
                 + " has joined the game...");
         PlayerMP player = new PlayerMP(packet.getX(), packet.getY(), this.gss, packet.getUsername(), address, port);
-        GenericSpaceShooter.standardHandler.addEntity(player);
+        GenericSpaceShooter.standardHandler.getEntities().add(player);
         GenericSpaceShooter.standardHandler.playerList.add(player);
     }
 
@@ -93,5 +98,11 @@ public class GameClient extends Thread {
 
     private void handleEnemy(PacketEnemy packet){
         GenericSpaceShooter.standardHandler.handleEnemy(packet.name, packet.x, packet.y);
+    }
+
+    private void handleBullet(PacketBullet packet) {
+        if(packet.getUsername().equals(GenericSpaceShooter.standardHandler.playerList.get(0).getUsername()))
+            return;
+        GenericSpaceShooter.standardHandler.handleBullet(packet);
     }
 }

@@ -34,7 +34,7 @@ public class GreenBat extends Enemy {
                 PacketEnemy packetEnemy = new PacketEnemy(this.name, (int) this.x, (int) this.y);
                 packetEnemy.writeData(gss.socketClient);
             }
-            GenericSpaceShooter.standardHandler.removeEntity(this);
+            GenericSpaceShooter.standardHandler.getEntities().remove(this);
 
             return;
         }
@@ -57,7 +57,7 @@ public class GreenBat extends Enemy {
             return;
         } else {
             this.interval = 0;
-            GenericSpaceShooter.standardHandler.addEntity(new Bullet((this.x + this.width / 2), this.y, 2, this.getId()));
+            GenericSpaceShooter.standardHandler.getEntities().add(new Bullet((this.x + this.width / 2), this.y, 2, this.getId()));
         }
     }
 

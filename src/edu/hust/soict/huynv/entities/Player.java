@@ -5,6 +5,8 @@ import com.joshuacrotts.standards.StandardGameObject;
 import com.joshuacrotts.standards.StandardID;
 import com.joshuacrotts.standards.StdOps;
 import edu.hust.soict.huynv.GenericSpaceShooter;
+import edu.hust.soict.huynv.network.packets.Packet;
+import edu.hust.soict.huynv.network.packets.PacketBullet;
 import edu.hust.soict.huynv.network.packets.PacketPlayer;
 
 import javax.swing.*;
@@ -39,7 +41,7 @@ public class Player extends StandardGameObject implements KeyListener {
     public void tick() {
 
         if(this.health <= 0){
-            GenericSpaceShooter.standardHandler.removeEntity(this);
+            GenericSpaceShooter.standardHandler.getEntities().remove(this);
 //            JOptionPane.showMessageDialog(null, "Player " + username + " died, score was: "+GenericSpaceShooter.score);
 //            System.exit(0);
         }
@@ -114,7 +116,9 @@ public class Player extends StandardGameObject implements KeyListener {
             return;
         }else{
             this.interval = 0;
-            GenericSpaceShooter.standardHandler.addEntity(new Bullet((this.x + this.width / 2), this.y, -20, this.getId()));
+            PacketBullet packetBullet = new PacketBullet((int) this.x + this.width / 2, (int) this.y, -20, "Player", this.username);
+            packetBullet.writeData(gss.socketClient);
+            GenericSpaceShooter.standardHandler.getEntities().add(new Bullet((this.x + this.width / 2), this.y, -20, this.getId(), this.username));
         }
     }
 

@@ -1,13 +1,12 @@
 package edu.hust.soict.huynv.network;
 
 import com.joshuacrotts.standards.StandardGameObject;
+import com.joshuacrotts.standards.StandardID;
 import edu.hust.soict.huynv.GenericSpaceShooter;
+import edu.hust.soict.huynv.entities.Bullet;
 import edu.hust.soict.huynv.entities.PlayerMP;
 import edu.hust.soict.huynv.entities.enemies.GreenBat;
-import edu.hust.soict.huynv.network.packets.Packet;
-import edu.hust.soict.huynv.network.packets.PacketPlayer;
-import edu.hust.soict.huynv.network.packets.PacketEnemy;
-import edu.hust.soict.huynv.network.packets.PacketLogin;
+import edu.hust.soict.huynv.network.packets.*;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -73,6 +72,10 @@ public class GameServer extends Thread {
             case ENEMY:
                 packet = new PacketEnemy(data);
                 this.handleEnemy((PacketEnemy) packet);
+                break;
+            case BULLET:
+                packet = new PacketBullet(data);
+                this.handleBullet((PacketBullet) packet);
         }
     }
 
@@ -80,7 +83,6 @@ public class GameServer extends Thread {
         packet.writeData(this);
         if(packet.name!=null){
             if(getEnemy(packet.name) != null){
-//                GenericSpaceShooter.standardHandler.entities.remove(getEnemy(packet.name));
                 (getEnemy(packet.name)).health = 0;
                 }
         }
@@ -110,7 +112,7 @@ public class GameServer extends Thread {
         }
         if (!alreadyConnected) {
             this.connectedPlayers.add(player);
-            GenericSpaceShooter.standardHandler.addEntity(player);
+            GenericSpaceShooter.standardHandler.getEntities().add(player);
             GenericSpaceShooter.standardHandler.playerList.add(player);
         }
     }
@@ -171,12 +173,17 @@ public class GameServer extends Thread {
     }
 
 
-    private synchronized GreenBat getEnemy(String name){
-        for (StandardGameObject e : GenericSpaceShooter.standardHandler.entities) {
+    private GreenBat getEnemy(String name){
+        for (StandardGameObject e : GenericSpaceShooter.standardHandler.getEntities()) {
             if (e instanceof GreenBat && ((GreenBat) e).name.equals(name)) {
                 return (GreenBat) e;
             }
         }
         return null;
+    }
+
+    private void handleBullet(PacketBullet packet){
+        GenericSpaceShooter.standardHandler.handleBullet(packet);
+        packet.writeData(this);
     }
 }
