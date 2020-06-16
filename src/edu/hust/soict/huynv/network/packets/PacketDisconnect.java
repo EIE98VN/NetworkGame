@@ -12,6 +12,11 @@ public class PacketDisconnect extends Packet{
         this.username = dataArray[0];
     }
 
+    public PacketDisconnect(String username) {
+        super(01);
+        this.username = username;
+    }
+
     @Override
     public void writeData(GameClient client) {
         client.sendData(getData());

@@ -29,7 +29,8 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         GenericSpaceShooterHandler me = this;
         this.gss.window.getFrame().addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                System.out.println(me.playerName + " has left the game.");
+                PacketDisconnect packetDisconnect = new PacketDisconnect(me.playerName);
+                packetDisconnect.writeData(gss.socketClient);
             }
         });
     }
@@ -97,10 +98,6 @@ public class GenericSpaceShooterHandler extends StandardHandler {
                 }
             }
             this.getEntities().get(i).tick();
-
-            // Player disconnected
-            System.out.println("tick");
-
         }
     }
 
