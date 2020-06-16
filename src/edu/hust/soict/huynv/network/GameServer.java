@@ -60,7 +60,8 @@ public class GameServer extends Thread {
                 this.addConnection(player, (PacketLogin) packet);
                 break;
             case DISCONNECT:
-//                packet = new Packet01Disconnect(data);
+                packet = new PacketDisconnect(data);
+                handleDisconnect((PacketDisconnect) packet);
 //                System.out.println("[" + address.getHostAddress() + ":" + port + "] "
 //                        + ((Packet01Disconnect) packet).getUsername() + " has left...");
 //                this.removeConnection((Packet01Disconnect) packet);
@@ -188,6 +189,11 @@ public class GameServer extends Thread {
 
     private void handleBullet(PacketBullet packet) {
         GenericSpaceShooter.standardHandler.handleBullet(packet);
+        packet.writeData(this);
+    }
+
+    private void handleDisconnect(PacketDisconnect packet){
+        GenericSpaceShooter.standardHandler.handleDisconnect(packet.username);
         packet.writeData(this);
     }
 }

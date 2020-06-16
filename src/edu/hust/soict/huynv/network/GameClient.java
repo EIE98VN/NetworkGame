@@ -4,6 +4,8 @@ import edu.hust.soict.huynv.GenericSpaceShooter;
 import edu.hust.soict.huynv.network.packets.*;
 import edu.hust.soict.huynv.entities.PlayerMP;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.*;
 
@@ -15,6 +17,7 @@ public class GameClient extends Thread {
 
     public GameClient(GenericSpaceShooter gss, String ipAddress) {
         this.gss = gss;
+
         try {
             this.socket = new DatagramSocket();
             this.ipAddress = InetAddress.getByName(ipAddress);
@@ -51,10 +54,8 @@ public class GameClient extends Thread {
                 handleLogin((PacketLogin) packet, address, port);
                 break;
             case DISCONNECT:
-//                packet = new PacketDisconnect(data);
-//                System.out.println("[" + address.getHostAddress() + ":" + port + "] "
-//                        + ((PacketDisconnect) packet).getUsername() + " has left the world...");
-//                game.level.removePlayerMP(((PacketDisconnect) packet).getUsername());
+                packet = new PacketDisconnect(data);
+                handleDisconnect((PacketDisconnect) packet);
                 break;
             case PLAYER:
                 packet = new PacketPlayer(data);
@@ -104,5 +105,9 @@ public class GameClient extends Thread {
         if(packet.getUsername().equals(GenericSpaceShooter.standardHandler.playerList.get(0).getUsername()))
             return;
         GenericSpaceShooter.standardHandler.handleBullet(packet);
+    }
+
+    private void handleDisconnect(PacketDisconnect packet){
+        GenericSpaceShooter.standardHandler.handleDisconnect(packet.username);
     }
 }

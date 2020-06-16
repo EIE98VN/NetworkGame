@@ -7,20 +7,31 @@ import edu.hust.soict.huynv.entities.Bullet;
 import edu.hust.soict.huynv.entities.PlayerMP;
 import edu.hust.soict.huynv.entities.enemies.GreenBat;
 import edu.hust.soict.huynv.network.packets.PacketBullet;
+import edu.hust.soict.huynv.network.packets.PacketDisconnect;
 import edu.hust.soict.huynv.network.packets.PacketEnemy;
 import edu.hust.soict.huynv.network.packets.PacketPlayer;
 
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 public class GenericSpaceShooterHandler extends StandardHandler {
 
     public ArrayList<PlayerMP> playerList = new ArrayList<>();
     private GenericSpaceShooter gss;
+    public String playerName;
 
     public GenericSpaceShooterHandler(GenericSpaceShooter gss) {
         this.gss = gss;
         this.entities = new ArrayList<StandardGameObject>();
+
+        GenericSpaceShooterHandler me = this;
+        this.gss.window.getFrame().addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.out.println(me.playerName + " has left the game.");
+            }
+        });
     }
 
     public void tick() {
@@ -86,6 +97,10 @@ public class GenericSpaceShooterHandler extends StandardHandler {
                 }
             }
             this.getEntities().get(i).tick();
+
+            // Player disconnected
+            System.out.println("tick");
+
         }
     }
 
@@ -163,5 +178,11 @@ public class GenericSpaceShooterHandler extends StandardHandler {
             Bullet bullet = new Bullet(packet.getX(), packet.getY(), packet.getVelY(), id, packet.getUsername());
             this.getEntities().add(bullet);
         }
+    }
+
+    public void handleDisconnect(String username) {
+        int disconnectedPlayerIndex = getPlayerMPIndex(username);
+        System.out.println(username + " has disconnected.");
+        this.getEntities().remove(disconnectedPlayerIndex);
     }
 }

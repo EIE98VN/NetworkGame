@@ -14,6 +14,8 @@ import edu.hust.soict.huynv.network.packets.PacketEnemy;
 import edu.hust.soict.huynv.network.packets.PacketLogin;
 
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 
 public class GenericSpaceShooter extends StandardGame implements Runnable {
@@ -33,7 +35,6 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
         this.background = StdOps.loadImage("res/bg.png");
         this.consoleFPS = false;
         standardHandler = new GenericSpaceShooterHandler(this);
-
 
         this.StartGame();
     }
@@ -72,6 +73,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
 
         standardHandler.getEntities().add(player);
         standardHandler.playerList.add(player);
+        standardHandler.playerName = player.getUsername();
         this.addListener(player);
 
         if (JOptionPane.showConfirmDialog(this, "Do you want to run the server ?") == 0) {
@@ -100,6 +102,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
                 }
             }
         }
+
         super.StartGame();
     }
 
