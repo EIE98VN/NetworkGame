@@ -8,14 +8,15 @@ import edu.hust.soict.huynv.entities.PlayerMP;
 import edu.hust.soict.huynv.entities.enemies.GreenBat;
 import edu.hust.soict.huynv.network.packets.PacketBullet;
 import edu.hust.soict.huynv.network.packets.PacketEnemy;
+import edu.hust.soict.huynv.network.packets.PacketPlayer;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 public class GenericSpaceShooterHandler extends StandardHandler {
 
-    private GenericSpaceShooter gss;
     public ArrayList<PlayerMP> playerList = new ArrayList<>();
+    private GenericSpaceShooter gss;
 
     public GenericSpaceShooterHandler(GenericSpaceShooter gss) {
         this.gss = gss;
@@ -23,67 +24,74 @@ public class GenericSpaceShooterHandler extends StandardHandler {
     }
 
     public void tick() {
-        for (int i = 0; i < this.entities.size(); i++) {
+        for (int i = 0; i < this.getEntities().size(); i++) {
 
-//            if((this.entities.get(i) instanceof PlayerMP) && !(((PlayerMP) this.entities.get(i)).getUsername().equals(playerList.get(0).getUsername())))
-//                    continue;
+            if (gss.isServer) {
+                //Player and Enemy collision
+                if (this.getEntities().get(i).getId() == StandardID.Player) {
 
-            //Player and Enemy collision
-            if (this.entities.get(i).getId() == StandardID.Player) {
-
-                for (int j = 0; j < this.entities.size(); j++) {
+                    for (int j = 0; j < this.getEntities().size(); j++) {
 
 
-                    if ((this.entities.get(j).getId() == StandardID.Obstacle || this.entities.get(j).getId() == StandardID.Enemy) &&
-                            this.entities.get(j).getBounds().intersects(this.entities.get(i).getBounds())) {
+                        if ((this.getEntities().get(j).getId() == StandardID.Obstacle || this.getEntities().get(j).getId() == StandardID.Enemy) &&
+                                this.getEntities().get(j).getBounds().intersects(this.getEntities().get(i).getBounds())) {
 
-                        this.entities.get(i).health -= 20;
+                            PlayerMP player = (PlayerMP) this.getEntities().get(i);
+                            player.health -= 20;
+                            PacketPlayer packetPlayer = new PacketPlayer(player.getUsername(), player.score, (int) player.health);
+                            packetPlayer.writeData(gss.socketClient);
 
-                        GreenBat greenBat = (GreenBat) this.entities.get(j);
-                        PacketEnemy packetEnemy = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y);
-                        packetEnemy.writeData(gss.socketClient);
+                            GreenBat greenBat = (GreenBat) this.getEntities().get(j);
+                            PacketEnemy packetEnemy = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y, PacketEnemy.REMOVE);
+                            packetEnemy.writeData(gss.socketClient);
 
-                        if(gss.isServer){
                             this.getEntities().remove(j);
-                        }
 
-                        j--;
+//                        j--;
+
+                        }
 
                     }
 
                 }
 
-            }
+                //Player's bullet and Enemy collision
+                if (this.getEntities().get(i).getId() == StandardID.Weapon) {
 
-            //Player's bullet and Enemy collision
-            if (this.entities.get(i).getId() == StandardID.Weapon) {
+                    Bullet bullet = (Bullet) this.getEntities().get(i);
 
-                Bullet bullet = (Bullet) this.getEntities().get(i);
-                if(bullet.getUsername().equals(this.playerList.get(0).getUsername())){
-                    for (int j = 0; j < this.entities.size(); j++) {
-                        if (this.entities.get(j).getId() == StandardID.Enemy &&
-                                this.entities.get(j).getBounds().intersects(this.entities.get(i).getBounds())) {
+                    for (int j = 0; j < this.getEntities().size(); j++) {
+                        if (this.getEntities().get(j).getId() == StandardID.Enemy &&
+                                this.getEntities().get(j).getBounds().intersects(this.getEntities().get(i).getBounds())) {
 
-                            this.entities.get(j).health -= 20;
+                            GreenBat greenBat = (GreenBat) this.getEntities().get(j);
+                            greenBat.health -= 20;
 
-                            if(this.entities.get(j).health <= 0 ){
-                                playerList.get(0).score++;
+                            if (this.getEntities().get(j) == null)
+                                continue;
+
+                            if (this.getEntities().get(j).health <= 0) {
+                                PlayerMP player = (PlayerMP) playerList.get(getPlayerMPIndex(bullet.getUsername()));
+                                player.score++;
+                                PacketPlayer packetPlayer = new PacketPlayer(player.getUsername(), player.score, (int) player.health);
+                                packetPlayer.writeData(gss.socketClient);
+
+                                PacketEnemy packetEnemy = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y, PacketEnemy.REMOVE);
+                                packetEnemy.writeData(gss.socketClient);
                             }
                         }
 
+
                     }
                 }
-
             }
-
-
-            this.entities.get(i).tick();
+            this.getEntities().get(i).tick();
         }
     }
 
     public void render(Graphics2D graphics2D) {
-        for (int i = 0; i < this.entities.size(); i++) {
-            this.entities.get(i).render(graphics2D);
+        for (int i = 0; i < this.getEntities().size(); i++) {
+            this.getEntities().get(i).render(graphics2D);
         }
     }
 
@@ -98,12 +106,19 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         return index;
     }
 
-    public void handlePlayer(String username, int score, int x, int y) {
-        int index = getPlayerMPIndex(username);
+    public void handlePlayer(PacketPlayer packet) {
+        int index = getPlayerMPIndex(packet.getUsername());
         PlayerMP player = (PlayerMP) this.getEntities().get(index);
-        player.score = score;
-        player.x = x;
-        player.y = y;
+        if (packet.getScore() != 0) {
+            player.score = packet.getScore();
+        }
+        if (packet.getHealth() != 0) {
+            player.health = packet.getHealth();
+        }
+        if (packet.getX() != 0 && packet.getY() != 0) {
+            player.x = packet.getX();
+            player.y = packet.getY();
+        }
     }
 
     private int getEnemyIndex(String name) {
@@ -117,17 +132,18 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         return -1;
     }
 
-    public  void handleEnemy(String enemyName, int x, int y){
-        if(getEnemyIndex(enemyName)==-1){
+    public void handleEnemy(String enemyName, int x, int y, String behaviour) {
+        if(behaviour.equals(PacketEnemy.ADD)){
             GreenBat greenBat = new GreenBat(enemyName, x, y, this.gss);
             this.getEntities().add(greenBat);
-        }else{
-            this.getEntities().remove(getEnemy(enemyName));
+        }else if(behaviour.equals(PacketEnemy.REMOVE)){
+            GreenBat greenBat = getEnemy(enemyName);
+            this.getEntities().remove(greenBat);
         }
 
     }
 
-    private  GreenBat getEnemy(String name){
+    private GreenBat getEnemy(String name) {
         for (StandardGameObject e : getEntities()) {
             if (e instanceof GreenBat && ((GreenBat) e).name.equals(name)) {
                 return (GreenBat) e;
@@ -136,15 +152,14 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         return null;
     }
 
-    public synchronized ArrayList<StandardGameObject> getEntities(){
-
+    public synchronized ArrayList<StandardGameObject> getEntities() {
         return this.entities;
     }
 
 
     public void handleBullet(PacketBullet packet) {
-        if(packet != null){
-            StandardID id = (packet.getId().equals("Player")) ? StandardID.Player:StandardID.Enemy;
+        if (packet != null) {
+            StandardID id = (packet.getId().equals("Player")) ? StandardID.Player : StandardID.Enemy;
             Bullet bullet = new Bullet(packet.getX(), packet.getY(), packet.getVelY(), id, packet.getUsername());
             this.getEntities().add(bullet);
         }

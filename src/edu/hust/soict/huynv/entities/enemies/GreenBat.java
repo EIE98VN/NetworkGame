@@ -23,15 +23,15 @@ public class GreenBat extends Enemy {
         this.width = this.currentSprite.getWidth();
 
         this.health = 40;
-        this.velY = 2;
+        this.velY = 3;
     }
 
     @Override
     public void tick() {
 
-        if (this.health <= 0 || this.y >= 800) {
-            if (this.health <= 0) {
-                PacketEnemy packetEnemy = new PacketEnemy(this.name, (int) this.x, (int) this.y);
+        if ((this.health <= 0 || this.y >= 800)) {
+            if (this.health <= 0 && gss.isServer) {
+                PacketEnemy packetEnemy = new PacketEnemy(this.name, (int) this.x, (int) this.y, PacketEnemy.REMOVE);
                 packetEnemy.writeData(gss.socketClient);
             }
             GenericSpaceShooter.standardHandler.getEntities().remove(this);

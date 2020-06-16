@@ -91,13 +91,13 @@ public class GameClient extends Thread {
     }
 
     private void handlePlayer(PacketPlayer packet) {
-        if(packet.getUsername().equals(GenericSpaceShooter.standardHandler.playerList.get(0).getUsername()))
+        if(packet.getUsername().equals(GenericSpaceShooter.standardHandler.playerList.get(0).getUsername()) && packet.getX()!=0)
             return;
-        GenericSpaceShooter.standardHandler.handlePlayer(packet.getUsername(), packet.getScore(), packet.getX(), packet.getY());
+        GenericSpaceShooter.standardHandler.handlePlayer(packet);
     }
 
     private void handleEnemy(PacketEnemy packet){
-        GenericSpaceShooter.standardHandler.handleEnemy(packet.name, packet.x, packet.y);
+        GenericSpaceShooter.standardHandler.handleEnemy(packet.name, packet.x, packet.y, packet.behaviour);
     }
 
     private void handleBullet(PacketBullet packet) {

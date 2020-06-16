@@ -44,11 +44,15 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
 
     @Override
     public void tick() {
+//        System.out.println("SIZE: "+ GenericSpaceShooter.standardHandler.getEntities().size());
+
         //only server generates enemy
-        if ((GenericSpaceShooter.standardHandler.size() < 5) && isServer) {
+        if ((GenericSpaceShooter.standardHandler.getEntities().size() < 10) && isServer) {
+
             enemyCount++;
+//            System.out.println("Send enemy"+enemyCount);
             GreenBat greenBat = new GreenBat("enemy" + enemyCount, StdOps.rand(50, 450), StdOps.rand(-500, -50), this);
-            PacketEnemy enemyPacket = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y);
+            PacketEnemy enemyPacket = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y, PacketEnemy.ADD);
             enemyPacket.writeData(this.socketClient);
             GenericSpaceShooter.standardHandler.getEntities().add(greenBat);
         }

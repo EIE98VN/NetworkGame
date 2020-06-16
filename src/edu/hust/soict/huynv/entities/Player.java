@@ -34,7 +34,7 @@ public class Player extends StandardGameObject implements KeyListener {
         this.width = this.currentSprite.getWidth();
         this.height = this.currentSprite.getHeight();
 
-        this.health = 500;
+        this.health = 50000;
     }
 
     @Override
@@ -49,13 +49,13 @@ public class Player extends StandardGameObject implements KeyListener {
         this.x += this.velX;
         this.y += this.velY;
 
-        //only main player of this game sends packet
+        //only main player of this game sends this packet
         if(this.username.equals(GenericSpaceShooter.standardHandler.playerList.get(0).getUsername())){
-            PacketPlayer packetPlayer = new PacketPlayer(this.username, this.score, (int) this.getX(), (int) this.getY());
+            PacketPlayer packetPlayer = new PacketPlayer((int) this.getX(), (int) this.getY(), this.username);
             packetPlayer.writeData(gss.socketClient);
         }
 
-        this.firBulletCheck();
+        this.fireBulletCheck();
         this.checkCoordinates();
     }
 
@@ -122,7 +122,7 @@ public class Player extends StandardGameObject implements KeyListener {
         }
     }
 
-    private void firBulletCheck(){
+    private void fireBulletCheck(){
         this.interval ++;
 
         if(this.interval > FIRE_INTERVAL){

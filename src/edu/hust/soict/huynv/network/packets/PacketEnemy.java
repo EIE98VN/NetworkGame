@@ -6,7 +6,9 @@ import edu.hust.soict.huynv.network.GameServer;
 public class PacketEnemy extends Packet {
 
     public int x,y;
-    public String name;
+    public String name, behaviour;
+    public final static String REMOVE = "remove";
+    public final static String ADD = "add";
 
     public PacketEnemy(byte[] data) {
         super(03);
@@ -14,13 +16,15 @@ public class PacketEnemy extends Packet {
         this.name = dataArray[0];
         this.x = Integer.parseInt(dataArray[1]);
         this.y = Integer.parseInt(dataArray[2]);
+        this.behaviour = dataArray[3];
     }
 
-    public PacketEnemy(String name, int x, int y){
+    public PacketEnemy(String name, int x, int y, String behaviour){
         super(03);
         this.name = name;
         this.x = x;
         this.y =y;
+        this.behaviour = behaviour;
     }
 
     @Override
@@ -35,6 +39,6 @@ public class PacketEnemy extends Packet {
 
     @Override
     public byte[] getData() {
-        return ("03" + this.name + "," + this.x + "," + this.y).getBytes();
+        return ("03" + this.name + "," + this.x + "," + this.y + "," + this.behaviour).getBytes();
     }
 }

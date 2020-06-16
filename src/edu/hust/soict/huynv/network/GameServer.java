@@ -1,9 +1,7 @@
 package edu.hust.soict.huynv.network;
 
 import com.joshuacrotts.standards.StandardGameObject;
-import com.joshuacrotts.standards.StandardID;
 import edu.hust.soict.huynv.GenericSpaceShooter;
-import edu.hust.soict.huynv.entities.Bullet;
 import edu.hust.soict.huynv.entities.PlayerMP;
 import edu.hust.soict.huynv.entities.enemies.GreenBat;
 import edu.hust.soict.huynv.network.packets.*;
@@ -14,13 +12,15 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
 import java.util.List;
 
 public class GameServer extends Thread {
 
+    public List<PlayerMP> connectedPlayers = new ArrayList<>();
     private DatagramSocket socket;
     private GenericSpaceShooter gss;
-    public List<PlayerMP> connectedPlayers = new ArrayList<>();
 
     public GameServer(GenericSpaceShooter gss) {
         this.gss = gss;
@@ -81,10 +81,10 @@ public class GameServer extends Thread {
 
     private void handleEnemy(PacketEnemy packet) {
         packet.writeData(this);
-        if(packet.name!=null){
-            if(getEnemy(packet.name) != null){
+        if (packet.name != null) {
+            if (getEnemy(packet.name) != null) {
                 (getEnemy(packet.name)).health = 0;
-                }
+            }
         }
     }
 
@@ -161,28 +161,32 @@ public class GameServer extends Thread {
 
     private void handlePlayer(PacketPlayer packet) {
         if (getPlayerMP(packet.getUsername()) != null) {
-            if(!packet.getUsername().equals(GenericSpaceShooter.standardHandler.playerList.get(0).getUsername())){
-                int index = getPlayerMPIndex(packet.getUsername());
-                PlayerMP player = this.connectedPlayers.get(index);
-                player.score = packet.getScore();
-                player.x = packet.getX();
-                player.y = packet.getY();
+            if (!packet.getUsername().equals(GenericSpaceShooter.standardHandler.playerList.get(0).getUsername())) {
+                GenericSpaceShooter.standardHandler.handlePlayer(packet);
             }
             packet.writeData(this);
         }
     }
 
 
-    private GreenBat getEnemy(String name){
-        for (StandardGameObject e : GenericSpaceShooter.standardHandler.getEntities()) {
-            if (e instanceof GreenBat && ((GreenBat) e).name.equals(name)) {
-                return (GreenBat) e;
+    private GreenBat getEnemy(String name) {
+        Iterator<StandardGameObject> iterator =  GenericSpaceShooter.standardHandler.getEntities().iterator();
+
+        try {
+            while (iterator.hasNext()) {
+                StandardGameObject gameObject = iterator.next();
+                if (gameObject instanceof GreenBat && ((GreenBat) gameObject).name.equals(name)) {
+                    return (GreenBat) gameObject;
+                }
             }
+        }catch (ConcurrentModificationException ex){
+            System.out.println("ConcurrentModificationException on getEnemy");
         }
+
         return null;
     }
 
-    private void handleBullet(PacketBullet packet){
+    private void handleBullet(PacketBullet packet) {
         GenericSpaceShooter.standardHandler.handleBullet(packet);
         packet.writeData(this);
     }
