@@ -57,7 +57,7 @@ public class GameServer extends Thread {
                 System.out.println("[" + address.getHostAddress() + ":" + port + "] "
                         + ((PacketLogin) packet).getUsername() + " has connected...");
                 PlayerMP player = new PlayerMP(300, 800, gss, ((PacketLogin) packet).getUsername(), address, port);
-                this.addConnection(player, (PacketLogin) packet);
+                this.handleConnection(player, (PacketLogin) packet);
                 break;
             case DISCONNECT:
                 packet = new PacketDisconnect(data);
@@ -90,7 +90,7 @@ public class GameServer extends Thread {
         }
     }
 
-    public void addConnection(PlayerMP player, PacketLogin packet) {
+    public void handleConnection(PlayerMP player, PacketLogin packet) {
         boolean alreadyConnected = false;
         for (PlayerMP p : this.connectedPlayers) {
             if (player.getUsername().equalsIgnoreCase(p.getUsername())) {
@@ -102,14 +102,13 @@ public class GameServer extends Thread {
                 }
                 alreadyConnected = true;
             } else {
-                // relay to the current connected player that there is a new
-                // player
+                // relay to the current connected player that there is a new player
+                System.out.println("Send " + packet.getUsername() + " to " + p.getUsername());
                 sendData(packet.getData(), p.ipAddress, p.port);
 
-                // relay to the new player that the currently connect player
-                // exists
-                packet = new PacketLogin(p.getUsername(), (int) p.x, (int) p.y);
-                sendData(packet.getData(), player.ipAddress, player.port);
+                // relay to the new player that the currently connect player exists
+                PacketLogin currentPlayerPacket = new PacketLogin(p.getUsername(), (int) p.x, (int) p.y);
+                sendData(currentPlayerPacket.getData(), player.ipAddress, player.port);
             }
         }
         if (!alreadyConnected) {

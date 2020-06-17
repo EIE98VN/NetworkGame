@@ -88,7 +88,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
 
         PacketLogin loginPacket = new PacketLogin(player.getUsername(), (int) player.x, (int) player.y);
         if (socketServer != null) {
-            socketServer.addConnection((PlayerMP) player, loginPacket);
+            socketServer.handleConnection((PlayerMP) player, loginPacket);
         }
         loginPacket.writeData(socketClient);
 
