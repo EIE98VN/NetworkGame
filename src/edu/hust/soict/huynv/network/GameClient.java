@@ -1,11 +1,9 @@
 package edu.hust.soict.huynv.network;
 
 import edu.hust.soict.huynv.GenericSpaceShooter;
-import edu.hust.soict.huynv.network.packets.*;
 import edu.hust.soict.huynv.entities.PlayerMP;
+import edu.hust.soict.huynv.network.packets.*;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.*;
 
@@ -84,6 +82,8 @@ public class GameClient extends Thread {
     }
 
     private void handleLogin(PacketLogin packet, InetAddress address, int port) {
+        if(GenericSpaceShooter.standardHandler.playerList.get(0).getUsername().equals(packet.getUsername()))
+            return;
         System.out.println("[" + address.getHostAddress() + ":" + port + "] " + packet.getUsername()
                 + " has joined the game...");
         PlayerMP player = new PlayerMP(packet.getX(), packet.getY(), this.gss, packet.getUsername(), address, port);

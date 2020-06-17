@@ -5,7 +5,6 @@ import com.joshuacrotts.standards.StandardDraw;
 import com.joshuacrotts.standards.StandardGame;
 import com.joshuacrotts.standards.StandardHandler;
 import com.joshuacrotts.standards.StdOps;
-import edu.hust.soict.huynv.entities.Player;
 import edu.hust.soict.huynv.entities.PlayerMP;
 import edu.hust.soict.huynv.entities.enemies.GreenBat;
 import edu.hust.soict.huynv.network.GameClient;
@@ -14,19 +13,16 @@ import edu.hust.soict.huynv.network.packets.PacketEnemy;
 import edu.hust.soict.huynv.network.packets.PacketLogin;
 
 import javax.swing.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 
 public class GenericSpaceShooter extends StandardGame implements Runnable {
 
     public static GenericSpaceShooterHandler standardHandler;
     public static int score = 0;
+    public static boolean isServer = false;
     public GameClient socketClient;
     public GameServer socketServer;
     public BufferedImage background = null;
-    public static boolean isServer = false;
-
     public int enemyCount = 0;
 
     public GenericSpaceShooter(int width, int height, String title) {
@@ -45,8 +41,16 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
 
     @Override
     public void tick() {
-//        System.out.println("SIZE: "+ GenericSpaceShooter.standardHandler.getEntities().size());
-
+        String endgameMessage = "";
+//        System.out.println(standardHandler.deadPlayers.size());
+        if(standardHandler.deadPlayers.size() == 3){
+            for (PlayerMP player: standardHandler.playerList ) {
+                System.out.println(player.getUsername() + " score: " + player.score);
+                endgameMessage += "Player " + player.getUsername() + " : " + player.score + "\n";
+            }
+            JOptionPane.showMessageDialog(this, endgameMessage);
+            System.exit(0);
+        }
         //only server generates enemy
         if ((GenericSpaceShooter.standardHandler.getEntities().size() < 10) && isServer) {
 
@@ -85,23 +89,28 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
         socketClient = new GameClient(this, "localhost");
         socketClient.start();
 
-
         PacketLogin loginPacket = new PacketLogin(player.getUsername(), (int) player.x, (int) player.y);
         if (socketServer != null) {
+            socketServer.connectedPlayers.add(player);
             socketServer.handleConnection((PlayerMP) player, loginPacket);
         }
         loginPacket.writeData(socketClient);
 
-        if (socketServer != null) {
-            while (socketServer.connectedPlayers.size() < 2) {
-                System.out.println("Client count: " + socketServer.connectedPlayers.size());
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        JDialog waitingDialog = new JDialog(this.window.getFrame());
+        waitingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        waitingDialog.setLocationRelativeTo(this.window.getFrame());
+        waitingDialog.add(new JLabel("Waiting for other player"));
+        waitingDialog.setSize(300, 100);
+        waitingDialog.setVisible(true);
+        while (standardHandler.playerList.size() < 3) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
+
+        waitingDialog.dispose();
 
         super.StartGame();
     }

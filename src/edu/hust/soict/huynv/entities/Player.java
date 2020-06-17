@@ -46,6 +46,7 @@ public class Player extends StandardGameObject implements KeyListener {
                 packetPlayer.writeData(gss.socketClient);
             }
             GenericSpaceShooter.standardHandler.getEntities().remove(this);
+            this.gss.standardHandler.deadPlayers.add((PlayerMP)this);
 //            JOptionPane.showMessageDialog(null, "Player " + username + " died, score was: "+GenericSpaceShooter.score);
 //            System.exit(0);
         }

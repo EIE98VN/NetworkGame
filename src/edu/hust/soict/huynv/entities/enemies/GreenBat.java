@@ -23,7 +23,7 @@ public class GreenBat extends Enemy {
         this.width = this.currentSprite.getWidth();
 
         this.health = 40;
-        this.velY = 3;
+        this.velY = 6;
     }
 
     @Override

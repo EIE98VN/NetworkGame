@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 public class GenericSpaceShooterHandler extends StandardHandler {
 
     public ArrayList<PlayerMP> playerList = new ArrayList<>();
+    public ArrayList<PlayerMP> deadPlayers = new ArrayList<>();
+
     private GenericSpaceShooter gss;
     public String playerName;
     public boolean isDisconnected = false;
@@ -218,6 +220,7 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         this.disconnectText = username + " has disconnected.";
         if (disconnectedPlayer != null) {
             this.getEntities().remove(disconnectedPlayer);
+            this.deadPlayers.add(disconnectedPlayer);
         }
     }
 
