@@ -12,11 +12,15 @@ import edu.hust.soict.huynv.network.packets.PacketDisconnect;
 import edu.hust.soict.huynv.network.packets.PacketEnemy;
 import edu.hust.soict.huynv.network.packets.PacketPlayer;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
@@ -25,11 +29,16 @@ public class GenericSpaceShooterHandler extends StandardHandler {
     public ArrayList<PlayerMP> playerList = new ArrayList<>();
     private GenericSpaceShooter gss;
     public String playerName;
+    public boolean isDisconnected = false;
+    public String disconnectText = "";
+    public Instant start;
+    public Instant end;
 
     public GenericSpaceShooterHandler(GenericSpaceShooter gss) {
         this.gss = gss;
         this.entities = new ArrayList<StandardGameObject>();
-
+        this.start = null;
+        this.end = null;
         GenericSpaceShooterHandler me = this;
         this.gss.window.getFrame().addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -109,6 +118,25 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         for (int i = 0; i < this.getEntities().size(); i++) {
             this.getEntities().get(i).render(graphics2D);
         }
+        if (this.isDisconnected) {
+            Font font = new Font("bold", Font.BOLD, 20);
+            StandardDraw.text(disconnectText, 150, 150  , font, 20f, Color.WHITE);
+            if (this.start == null) {
+                this.start = Instant.now();
+            }
+            if (this.end == null) {
+                this.end = this.start.plusSeconds(3);
+            } else {
+                Duration timeElapsed = Duration.between(Instant.now(), end);
+                System.out.println(timeElapsed.toMillis());
+                if (timeElapsed.toMillis() < 500) {
+                    this.start = null;
+                    this.end = null;
+                    this.isDisconnected = false;
+                    this.disconnectText = "";
+                }
+            }
+        }
     }
 
     private int getPlayerMPIndex(String username) {
@@ -186,9 +214,8 @@ public class GenericSpaceShooterHandler extends StandardHandler {
     public void handleDisconnect(String username) {
         PlayerMP disconnectedPlayer = getPlayerMP(username);
         System.out.println(username + " has disconnected.");
-//        for (long stop = System.nanoTime()+ TimeUnit.SECONDS.toNanos(2); stop>System.nanoTime();) {
-//            StandardDraw.text("Test", 50, 50  , "", 15f, Color.WHITE);
-//        }
+        this.isDisconnected = true;
+        this.disconnectText = username + " has disconnected.";
         if (disconnectedPlayer != null) {
             this.getEntities().remove(disconnectedPlayer);
         }
