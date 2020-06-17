@@ -15,6 +15,8 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
 
 public class GenericSpaceShooterHandler extends StandardHandler {
 
@@ -119,8 +121,10 @@ public class GenericSpaceShooterHandler extends StandardHandler {
     }
 
     public void handlePlayer(PacketPlayer packet) {
-        int index = getPlayerMPIndex(packet.getUsername());
-        PlayerMP player = (PlayerMP) this.getEntities().get(index);
+//        int index = getPlayerMPIndex(packet.getUsername());
+//        PlayerMP player = (PlayerMP) this.getEntities().get(index);
+        PlayerMP player = getPlayerMP(packet.getUsername());
+        if(player==null) return;
         if (packet.getScore() != 0) {
             player.score = packet.getScore();
         }
@@ -181,5 +185,22 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         int disconnectedPlayerIndex = getPlayerMPIndex(username);
         System.out.println(username + " has disconnected.");
         this.getEntities().remove(disconnectedPlayerIndex);
+    }
+
+    public PlayerMP getPlayerMP(String username) {
+        Iterator<StandardGameObject> iterator =  GenericSpaceShooter.standardHandler.getEntities().iterator();
+
+        try {
+            while (iterator.hasNext()) {
+                StandardGameObject gameObject = iterator.next();
+                if (gameObject instanceof PlayerMP && ((PlayerMP) gameObject).getUsername().equals(username)) {
+                    return (PlayerMP) gameObject;
+                }
+            }
+        }catch (ConcurrentModificationException ex){
+            System.out.println("ConcurrentModificationException on getEnemy");
+        }
+
+        return null;
     }
 }

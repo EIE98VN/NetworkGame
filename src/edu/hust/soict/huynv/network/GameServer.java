@@ -83,8 +83,9 @@ public class GameServer extends Thread {
     private void handleEnemy(PacketEnemy packet) {
         packet.writeData(this);
         if (packet.name != null) {
-            if (getEnemy(packet.name) != null) {
-                (getEnemy(packet.name)).health = 0;
+            GreenBat greenBat = getEnemy(packet.name);
+            if (greenBat != null) {
+                greenBat.health = 0;
             }
         }
     }

@@ -34,13 +34,17 @@ public class Player extends StandardGameObject implements KeyListener {
         this.width = this.currentSprite.getWidth();
         this.height = this.currentSprite.getHeight();
 
-        this.health = 50000;
+        this.health = 100;
     }
 
     @Override
     public void tick() {
 
         if(this.health <= 0){
+            if(GenericSpaceShooter.isServer){
+                PacketPlayer packetPlayer = new PacketPlayer(this.getUsername(), this.score, -1);
+                packetPlayer.writeData(gss.socketClient);
+            }
             GenericSpaceShooter.standardHandler.getEntities().remove(this);
 //            JOptionPane.showMessageDialog(null, "Player " + username + " died, score was: "+GenericSpaceShooter.score);
 //            System.exit(0);
