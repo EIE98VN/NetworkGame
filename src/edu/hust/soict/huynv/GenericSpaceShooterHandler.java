@@ -1,5 +1,6 @@
 package edu.hust.soict.huynv;
 
+import com.joshuacrotts.standards.StandardDraw;
 import com.joshuacrotts.standards.StandardGameObject;
 import com.joshuacrotts.standards.StandardHandler;
 import com.joshuacrotts.standards.StandardID;
@@ -17,6 +18,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 public class GenericSpaceShooterHandler extends StandardHandler {
 
@@ -182,9 +184,14 @@ public class GenericSpaceShooterHandler extends StandardHandler {
     }
 
     public void handleDisconnect(String username) {
-        int disconnectedPlayerIndex = getPlayerMPIndex(username);
+        PlayerMP disconnectedPlayer = getPlayerMP(username);
         System.out.println(username + " has disconnected.");
-        this.getEntities().remove(disconnectedPlayerIndex);
+//        for (long stop = System.nanoTime()+ TimeUnit.SECONDS.toNanos(2); stop>System.nanoTime();) {
+//            StandardDraw.text("Test", 50, 50  , "", 15f, Color.WHITE);
+//        }
+        if (disconnectedPlayer != null) {
+            this.getEntities().remove(disconnectedPlayer);
+        }
     }
 
     public PlayerMP getPlayerMP(String username) {

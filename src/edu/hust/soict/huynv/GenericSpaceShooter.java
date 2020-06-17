@@ -93,7 +93,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
         loginPacket.writeData(socketClient);
 
         if (socketServer != null) {
-            while (socketServer.connectedPlayers.size() < 3) {
+            while (socketServer.connectedPlayers.size() < 2) {
                 System.out.println("Client count: " + socketServer.connectedPlayers.size());
                 try {
                     Thread.sleep(1000);
