@@ -11,8 +11,12 @@ import edu.hust.soict.huynv.network.GameClient;
 import edu.hust.soict.huynv.network.GameServer;
 import edu.hust.soict.huynv.network.packets.PacketEnemy;
 import edu.hust.soict.huynv.network.packets.PacketLogin;
+import edu.hust.soict.huynv.screens.WaitingScreen;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 
 public class GenericSpaceShooter extends StandardGame implements Runnable {
@@ -42,7 +46,6 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
     @Override
     public void tick() {
         String endgameMessage = "";
-//        System.out.println(standardHandler.deadPlayers.size());
         if(standardHandler.deadPlayers.size() == 3){
             for (PlayerMP player: standardHandler.playerList ) {
                 System.out.println(player.getUsername() + " score: " + player.score);
@@ -55,7 +58,6 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
         if ((GenericSpaceShooter.standardHandler.getEntities().size() < 10) && isServer) {
 
             enemyCount++;
-//            System.out.println("Send enemy"+enemyCount);
             GreenBat greenBat = new GreenBat("enemy" + enemyCount, StdOps.rand(50, 450), StdOps.rand(-500, -50), this);
             PacketEnemy enemyPacket = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y, PacketEnemy.ADD);
             enemyPacket.writeData(this.socketClient);
@@ -96,13 +98,25 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
         }
         loginPacket.writeData(socketClient);
 
-        JDialog waitingDialog = new JDialog(this.window.getFrame());
-        waitingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        waitingDialog.setLocationRelativeTo(this.window.getFrame());
-        waitingDialog.add(new JLabel("Waiting for other player"));
-        waitingDialog.setSize(300, 100);
-        waitingDialog.setVisible(true);
-        while (standardHandler.playerList.size() < 3) {
+        WaitingScreen waitingScreen = new WaitingScreen(this.window.getFrame());
+        GenericSpaceShooter gss = this;
+        this.window.getFrame().addComponentListener(new ComponentAdapter() {
+            Point lastLocation = gss.window.getFrame().getLocation();;
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                if (lastLocation == null && gss.window.getFrame().isVisible()) {
+                    lastLocation = gss.window.getFrame().getLocation();
+                } else {
+                    Point newLocation = gss.window.getFrame().getLocation();
+                    int dx = newLocation.x - lastLocation.x;
+                    int dy = newLocation.y - lastLocation.y;
+                    waitingScreen.setLocation(waitingScreen.getX() + dx, waitingScreen.getY() + dy);
+                    lastLocation = newLocation;
+                }
+            }
+        });
+
+        while (standardHandler.playerList.size() < 2) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -110,7 +124,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
             }
         }
 
-        waitingDialog.dispose();
+        waitingScreen.dispose();
 
         super.StartGame();
     }
