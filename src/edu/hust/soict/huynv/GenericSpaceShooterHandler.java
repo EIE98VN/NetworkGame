@@ -120,8 +120,7 @@ public class GenericSpaceShooterHandler extends StandardHandler {
             this.getEntities().get(i).render(graphics2D);
         }
         if (this.isDisconnected) {
-            Font font = new Font("bold", Font.BOLD, 20);
-            StandardDraw.text(disconnectText, 150, 150  , font, 20f, Color.WHITE);
+            StandardDraw.text(disconnectText, 150, 150  , "", 20f, Color.WHITE);
             if (this.start == null) {
                 this.start = Instant.now();
             }
@@ -129,7 +128,6 @@ public class GenericSpaceShooterHandler extends StandardHandler {
                 this.end = this.start.plusSeconds(3);
             } else {
                 Duration timeElapsed = Duration.between(Instant.now(), end);
-                System.out.println(timeElapsed.toMillis());
                 if (timeElapsed.toMillis() < 500) {
                     this.start = null;
                     this.end = null;

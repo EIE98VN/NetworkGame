@@ -49,7 +49,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
     @Override
     public void tick() {
         String endgameMessage = "";
-        if(standardHandler.deadPlayers.size() == 2){
+        if(standardHandler.deadPlayers.size() == 3){
             for (PlayerMP player: standardHandler.playerList ) {
                 System.out.println(player.getUsername() + " score: " + player.score);
                 endgameMessage += "Player " + player.getUsername() + " : " + player.score + "\n";
@@ -141,7 +141,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
             }
         });
 
-        while (standardHandler.playerList.size() < 2) {
+        while (standardHandler.playerList.size() < 3) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
