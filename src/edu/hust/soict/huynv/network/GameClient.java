@@ -10,12 +10,13 @@ import java.net.*;
 public class GameClient extends Thread {
 
     private InetAddress ipAddress;
-    private DatagramSocket socket;
+    public DatagramSocket socket;
+    public boolean runnable;
     private GenericSpaceShooter gss;
 
     public GameClient(GenericSpaceShooter gss, String ipAddress) {
         this.gss = gss;
-
+        this.runnable = true;
         try {
             this.socket = new DatagramSocket();
             this.ipAddress = InetAddress.getByName(ipAddress);
@@ -27,7 +28,7 @@ public class GameClient extends Thread {
     }
 
     public void run() {
-        while (true) {
+        while (runnable) {
             byte[] data = new byte[1024];
             DatagramPacket packet = new DatagramPacket(data, data.length);
             try {
@@ -98,7 +99,7 @@ public class GameClient extends Thread {
     }
 
     private void handleEnemy(PacketEnemy packet){
-        GenericSpaceShooter.standardHandler.handleEnemy(packet.name, packet.x, packet.y, packet.behaviour);
+        GenericSpaceShooter.standardHandler.handleEnemy(packet.name, packet.x, packet.y, packet.behaviour, packet.velY);
     }
 
     private void handleBullet(PacketBullet packet) {

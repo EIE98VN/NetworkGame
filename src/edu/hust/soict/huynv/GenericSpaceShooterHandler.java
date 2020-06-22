@@ -35,7 +35,6 @@ public class GenericSpaceShooterHandler extends StandardHandler {
     public String disconnectText = "";
     public Instant start;
     public Instant end;
-
     public GenericSpaceShooterHandler(GenericSpaceShooter gss) {
         this.gss = gss;
         this.entities = new ArrayList<StandardGameObject>();
@@ -69,7 +68,7 @@ public class GenericSpaceShooterHandler extends StandardHandler {
                             packetPlayer.writeData(gss.socketClient);
 
                             GreenBat greenBat = (GreenBat) this.getEntities().get(j);
-                            PacketEnemy packetEnemy = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y, PacketEnemy.REMOVE);
+                            PacketEnemy packetEnemy = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y, PacketEnemy.REMOVE, (int) greenBat.velY);
                             packetEnemy.writeData(gss.socketClient);
 
                             this.getEntities().remove(j);
@@ -103,7 +102,7 @@ public class GenericSpaceShooterHandler extends StandardHandler {
                                 PacketPlayer packetPlayer = new PacketPlayer(player.getUsername(), player.score, (int) player.health);
                                 packetPlayer.writeData(gss.socketClient);
 
-                                PacketEnemy packetEnemy = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y, PacketEnemy.REMOVE);
+                                PacketEnemy packetEnemy = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y, PacketEnemy.REMOVE, (int) greenBat.velY);
                                 packetEnemy.writeData(gss.socketClient);
                             }
                         }
@@ -180,9 +179,9 @@ public class GenericSpaceShooterHandler extends StandardHandler {
         return -1;
     }
 
-    public void handleEnemy(String enemyName, int x, int y, String behaviour) {
+    public void handleEnemy(String enemyName, int x, int y, String behaviour, int velY) {
         if(behaviour.equals(PacketEnemy.ADD)){
-            GreenBat greenBat = new GreenBat(enemyName, x, y, this.gss);
+            GreenBat greenBat = new GreenBat(enemyName, x, y, velY, this.gss);
             this.getEntities().add(greenBat);
         }else if(behaviour.equals(PacketEnemy.REMOVE)){
             GreenBat greenBat = getEnemy(enemyName);

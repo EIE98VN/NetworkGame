@@ -19,11 +19,13 @@ import java.util.List;
 public class GameServer extends Thread {
 
     public List<PlayerMP> connectedPlayers = new ArrayList<>();
-    private DatagramSocket socket;
+    public DatagramSocket socket;
+    public boolean runnable;
     private GenericSpaceShooter gss;
 
     public GameServer(GenericSpaceShooter gss) {
         this.gss = gss;
+        this.runnable = true;
         try {
             this.socket = new DatagramSocket(1331);
         } catch (SocketException e) {
@@ -32,7 +34,7 @@ public class GameServer extends Thread {
     }
 
     public void run() {
-        while (true) {
+        while (runnable) {
             byte[] data = new byte[1024];
             DatagramPacket packet = new DatagramPacket(data, data.length);
             try {

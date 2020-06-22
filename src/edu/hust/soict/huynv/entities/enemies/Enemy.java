@@ -22,6 +22,4 @@ public abstract class Enemy extends StandardGameObject {
 
     @Override
     public abstract void render(Graphics2D graphics2D);
-
-    public abstract void fireBullet();
 }

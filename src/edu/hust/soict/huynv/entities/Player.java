@@ -34,7 +34,7 @@ public class Player extends StandardGameObject implements KeyListener {
         this.width = this.currentSprite.getWidth();
         this.height = this.currentSprite.getHeight();
 
-        this.health = 1000;
+        this.health = 100;
     }
 
     @Override

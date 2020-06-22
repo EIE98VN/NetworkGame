@@ -7,6 +7,7 @@ public class PacketEnemy extends Packet {
 
     public int x,y;
     public String name, behaviour;
+    public int velY;
     public final static String REMOVE = "remove";
     public final static String ADD = "add";
 
@@ -17,14 +18,16 @@ public class PacketEnemy extends Packet {
         this.x = Integer.parseInt(dataArray[1]);
         this.y = Integer.parseInt(dataArray[2]);
         this.behaviour = dataArray[3];
+        this.velY = Integer.parseInt(dataArray[4]);
     }
 
-    public PacketEnemy(String name, int x, int y, String behaviour){
+    public PacketEnemy(String name, int x, int y, String behaviour, int velY){
         super(03);
         this.name = name;
         this.x = x;
         this.y =y;
         this.behaviour = behaviour;
+        this.velY = velY;
     }
 
     @Override
@@ -39,6 +42,6 @@ public class PacketEnemy extends Packet {
 
     @Override
     public byte[] getData() {
-        return ("03" + this.name + "," + this.x + "," + this.y + "," + this.behaviour).getBytes();
+        return ("03" + this.name + "," + this.x + "," + this.y + "," + this.behaviour + "," + this.velY).getBytes();
     }
 }

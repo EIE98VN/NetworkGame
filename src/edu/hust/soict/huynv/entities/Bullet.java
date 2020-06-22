@@ -42,7 +42,7 @@ public class Bullet extends StandardGameObject {
     @Override
     public void tick() {
 
-        if(this.y <= -300 || this.y >= 1500){
+        if(this.y <= -20 || this.y >= 900){
             GenericSpaceShooter.standardHandler.getEntities().remove(this);
             return;
         }

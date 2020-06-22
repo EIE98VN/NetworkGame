@@ -2,7 +2,6 @@ package edu.hust.soict.huynv.entities.enemies;
 
 import com.joshuacrotts.standards.StdOps;
 import edu.hust.soict.huynv.GenericSpaceShooter;
-import edu.hust.soict.huynv.entities.Bullet;
 import edu.hust.soict.huynv.network.packets.PacketEnemy;
 
 import java.awt.*;
@@ -14,7 +13,7 @@ public class GreenBat extends Enemy {
     private boolean isCounted = false;
 
 
-    public GreenBat(String name, double x, double y, GenericSpaceShooter gss) {
+    public GreenBat(String name, double x, double y, double velY, GenericSpaceShooter gss) {
         super(name, x, y);
         this.gss = gss;
         this.currentSprite = StdOps.loadImage("res/greenbat.png");
@@ -23,7 +22,7 @@ public class GreenBat extends Enemy {
         this.width = this.currentSprite.getWidth();
 
         this.health = 40;
-        this.velY = 6;
+        this.velY = velY;
     }
 
     @Override
@@ -31,7 +30,7 @@ public class GreenBat extends Enemy {
 
         if ((this.health <= 0 || this.y >= 800)) {
             if (this.health <= 0 && gss.isServer) {
-                PacketEnemy packetEnemy = new PacketEnemy(this.name, (int) this.x, (int) this.y, PacketEnemy.REMOVE);
+                PacketEnemy packetEnemy = new PacketEnemy(this.name, (int) this.x, (int) this.y, PacketEnemy.REMOVE, (int) this.velY);
                 packetEnemy.writeData(gss.socketClient);
             }
             GenericSpaceShooter.standardHandler.getEntities().remove(this);
@@ -41,9 +40,6 @@ public class GreenBat extends Enemy {
 
         this.x += this.velX;
         this.y += this.velY;
-
-//        this.fireBulletCheck();
-//        this.fireBullet();
     }
 
     @Override
@@ -51,21 +47,4 @@ public class GreenBat extends Enemy {
         graphics2D.drawImage(this.currentSprite, (int) x, (int) y, null);
     }
 
-    @Override
-    public void fireBullet() {
-        if (this.interval < 200) {
-            return;
-        } else {
-            this.interval = 0;
-            GenericSpaceShooter.standardHandler.getEntities().add(new Bullet((this.x + this.width / 2), this.y, 2, this.getId()));
-        }
-    }
-
-    private void fireBulletCheck() {
-        this.interval++;
-
-        if (this.interval > 200) {
-            this.interval = 200;
-        }
-    }
 }
