@@ -21,7 +21,6 @@ import java.util.ArrayList;
 public class GenericSpaceShooter extends StandardGame implements Runnable {
 
     public static GenericSpaceShooterHandler standardHandler;
-    public static int score = 0;
     public static boolean isServer = false;
     public GameClient socketClient;
     public GameServer socketServer;
@@ -30,7 +29,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
     public boolean isPlayed = false;
     public static boolean enterGame = false;
     public PlayerMP player;
-    public Level level;
+    private Level level;
 
     public GenericSpaceShooter(int width, int height, String title) {
         super(width, height, title);
@@ -49,7 +48,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
     @Override
     public void tick() {
         String endgameMessage = "";
-        if(standardHandler.deadPlayers.size() == 3){
+        if(standardHandler.deadPlayers.size() == 2){
             for (PlayerMP player: standardHandler.playerList ) {
                 System.out.println(player.getUsername() + " score: " + player.score);
                 endgameMessage += "Player " + player.getUsername() + " : " + player.score + "\n";
@@ -59,9 +58,9 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
         }
         //only server generates enemy
         if (isServer) {
+            System.out.println(GenericSpaceShooter.standardHandler.getEntities().size());
             if (GenericSpaceShooter.standardHandler.getEntities().size() < level.enemyNumber){
                 enemyCount++;
-                System.out.println(level.enemyNumber + " " + level.enemyVelY);
                 GreenBat greenBat = new GreenBat("enemy" + enemyCount, StdOps.rand(50, 450), StdOps.rand(-500, -50), level.enemyVelY, this);
                 PacketEnemy enemyPacket = new PacketEnemy(greenBat.name, (int) greenBat.x, (int) greenBat.y, PacketEnemy.ADD, (int) greenBat.velY);
                 enemyPacket.writeData(this.socketClient);
@@ -111,7 +110,7 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
             level.start();
         }
 
-        socketClient = new GameClient(this, "localhost");
+        socketClient = new GameClient(this, "192.168.43.58");
         socketClient.start();
 
         PacketLogin loginPacket = new PacketLogin(player.getUsername(), (int) player.x, (int) player.y);
@@ -141,11 +140,16 @@ public class GenericSpaceShooter extends StandardGame implements Runnable {
             }
         });
 
-        while (standardHandler.playerList.size() < 3) {
+        while (standardHandler.playerList.size() < 2) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+            if(standardHandler.playerList.size()==1 && !isServer){
+                waitingScreen.dispose();
+                JOptionPane.showMessageDialog(this, "Number of players is full !");
+                System.exit(0);
             }
         }
 

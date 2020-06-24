@@ -9,7 +9,7 @@ public class StartScreen extends JDialog {
     public StartScreen(GenericSpaceShooter gss){
         this.setSize(300, 150);
         this.setLayout(null);
-
+        this.setAlwaysOnTop(true);
         JButton playButton = new JButton("Play game");
         playButton.setVisible(true);
         playButton.setBounds(90, 10, 120, 30);

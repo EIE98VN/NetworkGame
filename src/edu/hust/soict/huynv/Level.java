@@ -17,13 +17,13 @@ public class Level extends Thread{
         this.level = level;
         if(this.level == 0){
             this.enemyVelY = 2;
-            this.enemyNumber = 10;
+            this.enemyNumber = 15;
         }else if(this.level == 1){
             this.enemyVelY = 3;
-            this.enemyNumber = 12;
+            this.enemyNumber = 17;
         }else{
-            this.enemyVelY = 5;
-            this.enemyNumber = 15;
+            this.enemyVelY = 4;
+            this.enemyNumber = 20;
         }
     }
 

@@ -55,6 +55,8 @@ public class GameServer extends Thread {
             case INVALID:
                 break;
             case LOGIN:
+                if(this.connectedPlayers.size() == 3)
+                    break;
                 packet = new PacketLogin(data);
                 System.out.println("[" + address.getHostAddress() + ":" + port + "] "
                         + ((PacketLogin) packet).getUsername() + " has connected...");
